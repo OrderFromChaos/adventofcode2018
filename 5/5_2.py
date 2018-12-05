@@ -30,9 +30,10 @@ class DoubleList:
 
 # NOTE: THERE IS A DELETION CASE WITH THE FIRST TWO CHARS. SO BE CAREFUL.
 
+# The solution from part A may be used to do part B.
+
 sizes = dict()
-for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
-    subpoly = re.sub('[' + upper + lower + ']','', poly)
+def reactPoly(subpoly):
     d = DoubleList()
     for letter in subpoly:
         d.append(letter)
@@ -57,6 +58,13 @@ for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
                 curr.next.prev = curr.prev.prev
                 curr = curr.prev.prev
         curr = curr.next
+    return ''.join(newpoly)
+
+basereact = reactPoly(poly)
+
+for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
+    subpoly = re.sub('[' + upper + lower + ']','', basereact)
+    newpoly = reactPoly(subpoly)
     sizes[upper] = len(newpoly)
 
 for key in sizes:
