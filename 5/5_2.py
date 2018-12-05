@@ -1,5 +1,8 @@
 import string
 import re
+import time
+
+start = time.time()
 
 with open('5.txt','r') as f:
     poly = f.readlines()[0][:-1] # Remove newline
@@ -25,27 +28,7 @@ class DoubleList:
             self.tail.next = new_node
             self.tail = new_node
 
-    def removeFirst(self, nodeval):
-        curr = self.head
-        while curr is not None:
-            if curr.value == nodeval:
-                if curr.prev is None: # If it's head, we need to reset head
-                    self.head = curr.next
-                    curr.next.prev = None
-                    break
-                elif curr.next is None: # Same with tail
-                    self.tail = curr.prev
-                    curr.prev.next = None
-                    break
-                else: # Everything else works as expected
-                    curr.prev.next = curr.next
-                    curr.next.prev = curr.prev
-                    break
-            curr = curr.next
-
-
 # NOTE: THERE IS A DELETION CASE WITH THE FIRST TWO CHARS. SO BE CAREFUL.
-
 
 sizes = dict()
 for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
@@ -75,5 +58,8 @@ for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
                 curr = curr.prev.prev
         curr = curr.next
     sizes[upper] = len(newpoly)
+
 for key in sizes:
     print(key, sizes[key])
+
+print(time.time()-start)
