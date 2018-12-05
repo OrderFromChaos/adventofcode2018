@@ -1,4 +1,5 @@
 import string
+import re
 
 with open('5.txt','r') as f:
     poly = f.readlines()[0][:-1] # Remove newline
@@ -46,29 +47,33 @@ class DoubleList:
 # NOTE: THERE IS A DELETION CASE WITH THE FIRST TWO CHARS. SO BE CAREFUL.
 
 
+sizes = dict()
+for upper, lower in zip(string.ascii_uppercase,string.ascii_lowercase):
+    subpoly = re.sub('[' + upper + lower + ']','', poly)
+    d = DoubleList()
+    for letter in subpoly:
+        d.append(letter)
+    newpoly = [d.head.value]
 
-d = DoubleList()
-for letter in poly:
-    d.append(letter)
-newpoly = [d.head.value]
-
-curr = d.head.next
-while curr is not None:
-    newpoly.append(curr.value)
-    if curr.prev.value.lower() == curr.value.lower() and ((curr.prev.value in negpol and curr.value in pospol) or (curr.prev.value in pospol and curr.value in negpol)):
-        newpoly.pop()
-        newpoly.pop()
-        if curr.next is None:
-            curr.prev.prev.next = None
-            newpoly.append(curr.prev.prev.value)
-            curr = curr.prev.prev
-        elif curr.prev.prev is None:
-            curr.next.prev = None
-            newpoly.append(curr.next.value)
-            curr = curr.next
-        else:
-            curr.prev.prev.next = curr.next
-            curr.next.prev = curr.prev.prev
-            curr = curr.prev.prev
-    curr = curr.next
-print(len(newpoly))
+    curr = d.head.next
+    while curr is not None:
+        newpoly.append(curr.value)
+        if curr.prev.value.lower() == curr.value.lower() and ((curr.prev.value in negpol and curr.value in pospol) or (curr.prev.value in pospol and curr.value in negpol)):
+            newpoly.pop()
+            newpoly.pop()
+            if curr.next is None:
+                curr.prev.prev.next = None
+                newpoly.append(curr.prev.prev.value)
+                curr = curr.prev.prev
+            elif curr.prev.prev is None:
+                curr.next.prev = None
+                newpoly.append(curr.next.value)
+                curr = curr.next
+            else:
+                curr.prev.prev.next = curr.next
+                curr.next.prev = curr.prev.prev
+                curr = curr.prev.prev
+        curr = curr.next
+    sizes[upper] = len(newpoly)
+for key in sizes:
+    print(key, sizes[key])
