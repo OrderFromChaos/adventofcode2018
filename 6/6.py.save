@@ -1,0 +1,74 @@
+from scipy.spatial import ConvexHull
+from scipy.spatial.distance import cityblock # :)
+import numpy as np
+from collections import Counter
+
+np.set_printoptions(threshold = 50*50)
+
+# Taking a guess here. I think if I exclude points that compose the
+# convex hull of this vector cluster, then I will have excluded all infinite-
+# regioned points.
+
+dataset = np.loadtxt('6.txt',delimiter=', ', dtype=int)
+hull = ConvexHull(dataset)
+nonhull = np.array([x for x in range(len(dataset)) if x not in hull.vertices])
+# I'm going to wait to use this until later (picking out solutions in the middle)
+
+print(dataset)
+print(len(dataset))
+
+# I guess I'll just do this the straightforward way (manhattan over some large region)
+# Or not, this has terrible complexity and I should have known right away
+#manhattan = np.zeros((400,400)) # Larger than max extents of entire dataset
+#for x in range(400):
+#    for y in range(400):
+#        # Compute manhattan on all points
+#        distances = {ind:cityblock(np.array([x,y]),z) for ind,z in enumerate(dataset)}
+#        manhattan[x,y] = min(distances, key=distances.get)
+#
+#print(manhattan)
+
+# Next solution: voronoi-like
+# Set a seed at each number start, then work out in a number of epochs.
+
+#def region_to_search(pos, epoch): # Should only look at the current epoch rhombus edge
+#    if epoch == 0:
+#        return [pos]
+#    else:
+#        search = []
+#        # Only return if inside the 400,400 bounds
+#        north, south = [np.array(0,epoch),np.array(0,-epoch)]
+#        search.append(north)
+#        search.append(south)
+#        # Create top right
+#        # for i in range(epoch):
+#        # So as it turns out, triangulation is a hard problem.
+#        # Maybe there's an easier solution?
+#
+#suitable = [x+1 for x in range(dataset)] # Indices moved up by 1 because we start with 0s
+#epoch = 0
+#while suitable:
+#    # As soon as a search region fails to return a number, remove that index from the suitable list
+#    # Eventually all should fail to find something
+#    failed = []
+#    for seed in suitable:
+#        found = False
+#        search = region_to_search(dataset[seed-1], epoch)
+#        for point in search:
+#            if manhattan[point] == 0:
+#                manhattan[point] = seed
+#                found = True
+#        if not found:
+#            failed.append(seed)
+#    for seedfail in failed:
+#        suitable.remove(seedfail)
+#    epoch += 1
+
+manhattan = np.zeros((400,400)) # Same size as last attempt
+
+# Easier solution: create seeds, search for nearest neighbors, add in if they're zero
+# Initial seed
+for index, x in enumerate(dataset):
+    print(x)
+    manhattan[x] = index + 1 # Want to reserve 0 for nothing currently there
+for line in dataset
