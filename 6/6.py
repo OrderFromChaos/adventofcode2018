@@ -88,25 +88,30 @@ sweeps = [np.array(x) for x in sweeps] # So we have access to element-wise subtr
 
 print(np.unique(manhattan, return_counts=True))
 
-start_man = manhattan
-
-for x in range(400):
-    for y in range(400):
-        if manhattan[x,y] not in {-1,0}:
-            challenger = manhattan[x,y] # Current beacon to take the spot
-            curpos = np.array([x,y])
-            # Start sweeping around for 0s to conquer
-            for direction in sweeps:
-                newdir = curpos + direction
-                if 0 < newdir[0] < 400 and 0 < newdir[1] < 400 and manhattan[newdir[0], newdir[1]] == 0: # Is a valid index in the numpy array and is 0
-                    # Now we have to check again to see if there's anything nearby. If there is, set to -1
-                    # If not, set to the current number we're sweeping from (challenger).
-                    for direction2 in sweeps:
-                        newdir2 = newdir + direction2
-                        if manhattan[newdir2[0], newdir2[1]] not in {0,-1,challenger}:
-                            manhattan[x,y] = -1
-                            break
-                    else: # This is a Python thing...
-                        manhattan[x,y] = challenger
-print(np.unique(manhattan, return_counts=True))
-print(manhattan is start_man)
+runno = 1
+while 0 in np.unique(manhattan):
+    print('Run',runno,'...')
+    print('    Currrent number of zeroes',np.unique(manhattan, return_counts=True)[1][1])
+    for x in range(400):
+        for y in range(400):
+            if manhattan[x,y] not in {-1,0}:
+                challenger = manhattan[x,y] # Current beacon to take the spot
+                curpos = np.array([x,y])
+                # Start sweeping around for 0s to conquer
+                for direction in sweeps:
+                    newdir = curpos + direction
+                    if 0 < newdir[0] < 400 and 0 < newdir[1] < 400 and manhattan[newdir[0], newdir[1]] == 0: # Is a valid index in the numpy array and is 0
+                        # Now we have to check again to see if there's anything nearby. If there is, set to -1
+                        # If not, set to the current number we're sweeping from (challenger).
+                        for direction2 in sweeps:
+                            newdir2 = newdir + direction2
+                            if 0 < newdir2[0] < 400 and 0 < newdir2[1] < 400:
+                                if manhattan[newdir2[0], newdir2[1]] not in {0,-1,challenger}:
+                                    manhattan[newdir[0], newdir[1]] = -1
+                                    break
+                        else: # This is a Python thing...
+                            manhattan[newdir[0], newdir[1]] = challenger
+    runno += 1
+freq = np.unique(manhattan, return_counts=True)
+print(freq)
+print(freq[1][nonhull])
