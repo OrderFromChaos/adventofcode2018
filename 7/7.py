@@ -1,4 +1,5 @@
 import string
+from operator import attrgetter
 
 with open('7.txt','r') as f:
     dataset = f.readlines()
@@ -11,50 +12,52 @@ depend = {letter:[] for letter in uppers}
 for rel in dataset:
     depend[rel[1]] += rel[0]
 
-print(depend)
-
-maxlayer = max([len(depend[key]) for key in depend])
-layers = {i:[key for key in depend if len(depend[key]) == i] for i in range(maxlayer)}
-instructions = ''
-for layer in layers:
-    instructions += ''.join(sorted(layers[layer]))
-print(instructions)
-
-# This is less trivial than I thought it was, so time to do a proper, non-jank implementation of a DAG
-
 class node:
-    def __init__(self,parents=[],children=[]):
+    def __init__(self,value=None,parents=[],children=[]):
+        self.value = value
         self.parents = parents
         self.children = children
     def __repr__(self):
-        return 'node(parents=' + str(self.parents) + ', children=' + str(self.children) + ')'
+        return 'node(value=' + str(self.value) + ', parents=' + str(self.parents) + ', children=' + str(self.children) + ')'
 
 class dagmod: # Directed acyclic graph
     # Collection of nodes
 
-    head = None
-    nodes = {letter:node() for letter in string.ascii_uppercase}
+    heads = []
+    nodes = {letter:node(value=letter) for letter in string.ascii_uppercase}
 
     def initfromdepend(self, depend):
         for d in depend:
             self.nodes[d].parents = depend[d]
-        # Now figure out whom is a child of who
-        for letter in self.nodes:
-            par = self.nodes[letter].parents
-            for daddy in par:
-                self.nodes[daddy].children += letter
 
-#        for letter in self.nodes:
-#            print(letter, self.nodes[letter])
+        # Now initialize children based on parents
+        for letter in self.nodes: # These are keys for nodes
+            par = self.nodes[letter].parents # Look up the current node's parents
+            for daddy in par: # Then for each parent, add the current letter to that parent's children
+                parnode = self.nodes[daddy]
+                # You have to be kinda careful here; with {a: obj}, you cannot safely edit obj by itself. You have to create a new obj
+                self.nodes[daddy] = node(parnode.value, parnode.parents, parnode.children + [letter])
 
+        for letter in self.nodes: # Do any of them even have no children? (nope and some reference themselves...)
+            if self.nodes[letter].children == []:
+                print(letter, self.nodes[letter])
+
+        # Find the nodes at the top of the list
         for letter in self.nodes:
-            if self.nodes[letter].parents == None:
-                self.head = self.nodes[letter]
+            if self.nodes[letter].parents == []:
+                self.heads.append(self.nodes[letter])
 
 graph = dagmod()
 graph.initfromdepend(depend)
 
-start = graph.head
-print(start)
-#while there_are_children:
-#    pass
+traversal = graph.heads
+instructions = ""
+while traversal != []:
+    print(len(traversal))
+    # Can't do this in waves; need to update travsort with every new node removal
+    travsort = sorted(traversal, key = lambda x: x.value)
+    graphnode = travsort[0]
+    instructions += graphnode.value
+    traversal.remove(graphnode)
+    traversal += [graph.nodes[x] for x in graphnode.children] # Just [] if there are no children. hence the base condition is satisfied
+print(instructions)
