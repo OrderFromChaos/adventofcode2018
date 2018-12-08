@@ -8,6 +8,6 @@ cookie = {'session':''}
 r = requests.post(url,cookies=cookie)
 text = r.content.decode('utf-8').split('\n')
 tail = [x for x in text if x] # Remove any empty stuff, like at the end
-with open('./' + day + '.txt','w') as f:
+with open('./' + day + '/' + day + '.txt','w') as f:
     for line in tail:
         f.write(line + '\n')
