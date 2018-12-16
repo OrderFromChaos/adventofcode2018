@@ -13,6 +13,17 @@ lookup = {'^': 0, # Clockwise order starting at north
           'v': 2,
           '<': 3}
 
+class cart:
+    def __init__(self, x, y, heading, state):
+        self.x = x
+        self.y = y
+        self.heading = heading
+        self.state = state
+    def heading(self):
+        # Gets the vector of heading instead of just the <^>v notation
+        
+
+
 def left(heading):
     left = '<^>v'
     if heading in {'^','>','v'}:
